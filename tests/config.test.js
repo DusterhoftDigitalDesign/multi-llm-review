@@ -33,7 +33,7 @@ describe('loadConfig', () => {
     vi.stubEnv('OPENAI_API_KEY', 'sk-test');
     const config = loadConfig();
     expect(config.anthropicKey).toBe('sk-ant-test');
-    expect(config.geminiModel).toBe('gemini-2.5-flash');
+    expect(config.geminiModel).toBe('gemini-3.1-pro-preview');
     expect(config.claudeModel).toBe('claude-sonnet-4-6');
     expect(config.gptModel).toBe('gpt-5.4');
   });

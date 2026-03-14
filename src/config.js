@@ -17,7 +17,7 @@ export function loadConfig() {
     anthropicKey: process.env.ANTHROPIC_API_KEY,
     geminiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     openaiKey: process.env.OPENAI_API_KEY,
-    geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    geminiModel: process.env.GEMINI_MODEL || 'gemini-3.1-pro-preview',
     claudeModel: process.env.CLAUDE_MODEL || 'claude-sonnet-4-6',
     gptModel: process.env.GPT_MODEL || 'gpt-5.4',
   };
