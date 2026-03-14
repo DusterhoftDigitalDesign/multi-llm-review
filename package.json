@@ -9,7 +9,8 @@
   "scripts": {
     "review": "node src/cli.js",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:integration": "cross-env INTEGRATION=true vitest run tests/integration.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
