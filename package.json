@@ -1,0 +1,24 @@
+{
+  "name": "multi-llm-review",
+  "version": "1.0.0",
+  "description": "Multi-LLM Code Review Pipeline for Düsterhöft Digital Design",
+  "type": "module",
+  "bin": {
+    "llm-review": "./src/cli.js"
+  },
+  "scripts": {
+    "review": "node src/cli.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@google/generative-ai": "^0.24.0",
+    "openai": "^6.29.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "vitest": "^3.0.0"
+  }
+}
