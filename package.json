@@ -10,13 +10,13 @@
     "review": "node src/cli.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:integration": "cross-env INTEGRATION=true vitest run tests/integration.test.js"
+    "test:integration": "cross-env INTEGRATION=true vitest run --config vitest.integration.config.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
-    "@google/generative-ai": "^0.24.0",
-    "openai": "^6.29.0",
-    "dotenv": "^16.4.0"
+    "@google/genai": "^1.45.0",
+    "dotenv": "^16.4.0",
+    "openai": "^6.29.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import { buildPrompt } from './prompts.js';
 
@@ -17,13 +17,15 @@ export function parseJson(text) {
 }
 
 export function createGeminiReviewer(config) {
-  const genAI = new GoogleGenerativeAI(config.geminiKey);
-  const model = genAI.getGenerativeModel({ model: config.geminiModel });
+  const ai = new GoogleGenAI({ apiKey: config.geminiKey });
 
   return async function reviewWithGemini(code, filename) {
     const prompt = buildPrompt('gemini', code, filename);
-    const result = await model.generateContent(prompt);
-    return parseJson(result.response.text());
+    const response = await ai.models.generateContent({
+      model: config.geminiModel,
+      contents: prompt,
+    });
+    return parseJson(response.text);
   };
 }
 

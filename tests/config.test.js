@@ -33,8 +33,8 @@ describe('loadConfig', () => {
     vi.stubEnv('OPENAI_API_KEY', 'sk-test');
     const config = loadConfig();
     expect(config.anthropicKey).toBe('sk-ant-test');
-    expect(config.geminiModel).toBe('gemini-3.1-pro');
-    expect(config.claudeModel).toBe('claude-sonnet-4-6-20260301');
+    expect(config.geminiModel).toBe('gemini-2.5-flash');
+    expect(config.claudeModel).toBe('claude-sonnet-4-6');
     expect(config.gptModel).toBe('gpt-5.4');
   });
 
@@ -42,8 +42,8 @@ describe('loadConfig', () => {
     vi.stubEnv('ANTHROPIC_API_KEY', 'test');
     vi.stubEnv('GOOGLE_GENERATIVE_AI_API_KEY', 'test');
     vi.stubEnv('OPENAI_API_KEY', 'test');
-    vi.stubEnv('GEMINI_MODEL', 'gemini-3.1-flash');
+    vi.stubEnv('GEMINI_MODEL', 'gemini-2.5-flash');
     const config = loadConfig();
-    expect(config.geminiModel).toBe('gemini-3.1-flash');
+    expect(config.geminiModel).toBe('gemini-2.5-flash');
   });
 });
