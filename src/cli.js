@@ -11,6 +11,14 @@ try {
   const jsonFlag = args.includes('--json');
   const filePath = args.find(a => !a.startsWith('--'));
 
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log('Usage: llm-review <file> [--json]\n');
+    console.log('  <file>   Path to the file to review');
+    console.log('  --json   Output machine-readable JSON');
+    console.log('  --help   Show this help message');
+    process.exit(0);
+  }
+
   if (!filePath) {
     console.error('Usage: llm-review <file> [--json]');
     console.error('  --json   Output machine-readable JSON');
@@ -56,5 +64,6 @@ try {
   }
 } catch (err) {
   console.error(`Error: ${err.message}`);
+  if (process.env.DEBUG) console.error(err.stack);
   process.exit(1);
 }

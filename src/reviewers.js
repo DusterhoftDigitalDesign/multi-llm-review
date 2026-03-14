@@ -5,15 +5,16 @@ import { buildPrompt } from './prompts.js';
 
 export function parseJson(text) {
   let cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  const match = cleaned.match(/\{[\s\S]*\}/);
+  const match = cleaned.match(/\{[\s\S]*?\}/g);
   if (!match) {
     throw new Error(`No JSON object found in response: ${cleaned.slice(0, 200)}`);
   }
-  try {
-    return JSON.parse(match[0]);
-  } catch (err) {
-    throw new Error(`Invalid JSON in LLM response: ${err.message}\nRaw: ${match[0].slice(0, 300)}`);
+  for (const candidate of match.reverse()) {
+    try {
+      return JSON.parse(candidate);
+    } catch { /* try next */ }
   }
+  throw new Error(`Invalid JSON in LLM response. Tried ${match.length} candidate(s).\nRaw: ${match[match.length - 1].slice(0, 300)}`);
 }
 
 export function createGeminiReviewer(config) {
