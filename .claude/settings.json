@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "Agent(*)",
+      "TodoWrite(*)",
+      "WebSearch(*)",
+      "WebFetch(*)",
+      "Skill(*)",
+      "ToolSearch(*)",
+      "NotebookEdit(*)",
+      "mcp__claude-skills__*",
+      "mcp__plugin_context7_context7__*",
+      "mcp__memory__*",
+      "mcp__perplexity__*"
+    ]
+  },
+  "mcpServers": {}
+}
