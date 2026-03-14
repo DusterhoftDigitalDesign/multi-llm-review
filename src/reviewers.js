@@ -1,0 +1,86 @@
+import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
+import { buildPrompt } from './prompts.js';
+
+export function parseJson(text) {
+  let cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  const match = cleaned.match(/\{[\s\S]*\}/);
+  if (!match) {
+    throw new Error(`No JSON object found in response: ${cleaned.slice(0, 200)}`);
+  }
+  try {
+    return JSON.parse(match[0]);
+  } catch (err) {
+    throw new Error(`Invalid JSON in LLM response: ${err.message}\nRaw: ${match[0].slice(0, 300)}`);
+  }
+}
+
+export function createGeminiReviewer(config) {
+  const genAI = new GoogleGenerativeAI(config.geminiKey);
+  const model = genAI.getGenerativeModel({ model: config.geminiModel });
+
+  return async function reviewWithGemini(code, filename) {
+    const prompt = buildPrompt('gemini', code, filename);
+    const result = await model.generateContent(prompt);
+    return parseJson(result.response.text());
+  };
+}
+
+export function createClaudeReviewer(config) {
+  const client = new Anthropic({ apiKey: config.anthropicKey });
+
+  return async function reviewWithClaude(code, filename) {
+    const prompt = buildPrompt('claude', code, filename);
+    const message = await client.messages.create({
+      model: config.claudeModel,
+      max_tokens: 4096,
+      temperature: 0.2,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    return parseJson(message.content[0].text);
+  };
+}
+
+export function createGptReviewer(config) {
+  const client = new OpenAI({ apiKey: config.openaiKey });
+
+  return async function reviewWithGpt(code, filename) {
+    const prompt = buildPrompt('gpt', code, filename);
+    const response = await client.chat.completions.create({
+      model: config.gptModel,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+    });
+    return parseJson(response.choices[0].message.content);
+  };
+}
+
+export async function reviewAll(geminiReviewer, claudeReviewer, gptReviewer) {
+  const reviewers = [
+    { name: 'gemini', fn: geminiReviewer },
+    { name: 'claude', fn: claudeReviewer },
+    { name: 'gpt', fn: gptReviewer },
+  ];
+
+  const results = await Promise.allSettled(
+    reviewers.map(r => r.fn())
+  );
+
+  return results.map((result, i) => {
+    if (result.status === 'fulfilled') {
+      return {
+        reviewer: reviewers[i].name,
+        findings: result.value.findings || [],
+        summary: result.value.summary || '',
+        error: null,
+      };
+    }
+    return {
+      reviewer: reviewers[i].name,
+      findings: [],
+      summary: '',
+      error: result.reason?.message || 'Unknown error',
+    };
+  });
+}
