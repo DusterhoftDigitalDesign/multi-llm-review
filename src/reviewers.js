@@ -4,27 +4,43 @@ import OpenAI from 'openai';
 import { buildPrompt } from './prompts.js';
 
 export function parseJson(text) {
+  if (typeof text !== 'string' || !text.trim()) {
+    throw new Error('Empty or non-string LLM response');
+  }
   let cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  const match = cleaned.match(/\{[\s\S]*?\}/g);
+
+  // Try to find the root object containing "findings" array
+  const findingsMatch = cleaned.match(/\{[\s\S]*"findings"\s*:\s*\[[\s\S]*\][\s\S]*\}/);
+  if (findingsMatch) {
+    try {
+      return JSON.parse(findingsMatch[0]);
+    } catch { /* fall through */ }
+  }
+
+  // Fallback: try the largest JSON object
+  const match = cleaned.match(/\{[\s\S]*\}/);
   if (!match) {
     throw new Error(`No JSON object found in response: ${cleaned.slice(0, 200)}`);
   }
-  for (const candidate of match.reverse()) {
-    try {
-      return JSON.parse(candidate);
-    } catch { /* try next */ }
+  try {
+    return JSON.parse(match[0]);
+  } catch {
+    throw new Error(`Invalid JSON in LLM response.\nRaw: ${match[0].slice(0, 300)}`);
   }
-  throw new Error(`Invalid JSON in LLM response. Tried ${match.length} candidate(s).\nRaw: ${match[match.length - 1].slice(0, 300)}`);
 }
 
 export function createGeminiReviewer(config) {
   const ai = new GoogleGenAI({ apiKey: config.geminiKey });
 
-  return async function reviewWithGemini(code, filename) {
-    const prompt = buildPrompt('gemini', code, filename);
+  return async function reviewWithGemini(code, filename, context) {
+    const { system, user } = buildPrompt('gemini', code, filename, context);
     const response = await ai.models.generateContent({
       model: config.geminiModel,
-      contents: prompt,
+      contents: user,
+      config: {
+        systemInstruction: system,
+        temperature: 0.5,
+      },
     });
     return parseJson(response.text);
   };
@@ -33,13 +49,14 @@ export function createGeminiReviewer(config) {
 export function createClaudeReviewer(config) {
   const client = new Anthropic({ apiKey: config.anthropicKey });
 
-  return async function reviewWithClaude(code, filename) {
-    const prompt = buildPrompt('claude', code, filename);
+  return async function reviewWithClaude(code, filename, context) {
+    const { system, user } = buildPrompt('claude', code, filename, context);
     const message = await client.messages.create({
       model: config.claudeModel,
       max_tokens: 4096,
-      temperature: 0.2,
-      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.5,
+      system,
+      messages: [{ role: 'user', content: user }],
     });
     return parseJson(message.content[0].text);
   };
@@ -48,12 +65,15 @@ export function createClaudeReviewer(config) {
 export function createGptReviewer(config) {
   const client = new OpenAI({ apiKey: config.openaiKey });
 
-  return async function reviewWithGpt(code, filename) {
-    const prompt = buildPrompt('gpt', code, filename);
+  return async function reviewWithGpt(code, filename, context) {
+    const { system, user } = buildPrompt('gpt', code, filename, context);
     const response = await client.chat.completions.create({
       model: config.gptModel,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.2,
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+      temperature: 0.5,
     });
     return parseJson(response.choices[0].message.content);
   };
@@ -76,6 +96,7 @@ export async function reviewAll(geminiReviewer, claudeReviewer, gptReviewer) {
         reviewer: reviewers[i].name,
         findings: result.value.findings || [],
         summary: result.value.summary || '',
+        cleanJustification: result.value.clean_justification || null,
         error: null,
       };
     }
@@ -83,6 +104,7 @@ export async function reviewAll(geminiReviewer, claudeReviewer, gptReviewer) {
       reviewer: reviewers[i].name,
       findings: [],
       summary: '',
+      cleanJustification: null,
       error: result.reason?.message || 'Unknown error',
     };
   });

@@ -1,7 +1,7 @@
 {
   "name": "multi-llm-review",
   "version": "1.0.0",
-  "description": "Multi-LLM Code Review Pipeline for Düsterhöft Digital Design",
+  "description": "Multi-LLM Code Review Pipeline — 3 LLMs review your code in parallel with consensus filtering",
   "type": "module",
   "bin": {
     "llm-review": "./src/cli.js"
