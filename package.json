@@ -18,6 +18,21 @@
     "dotenv": "^16.4.0",
     "openai": "^6.29.0"
   },
+  "author": "Düsterhöft Digital Design",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DusterhoftDigitalDesign/multi-llm-review.git"
+  },
+  "keywords": [
+    "code-review",
+    "llm",
+    "claude",
+    "gpt",
+    "gemini",
+    "consensus",
+    "cli"
+  ],
   "devDependencies": {
     "cross-env": "^7.0.3",
     "vitest": "^3.0.0"

@@ -46,7 +46,7 @@ Durch die Kombination verschiedener Perspektiven werden Probleme gefunden, die e
 
 ```bash
 # 1. Repository klonen
-git clone git@github.com:DEIN-USER/multi-llm-review.git
+git clone https://github.com/DusterhoftDigitalDesign/multi-llm-review.git
 cd multi-llm-review
 
 # 2. Dependencies installieren
@@ -227,4 +227,4 @@ Pro Review werden 3 API-Calls gemacht (+ optional 1 fuer Verification). Die Kost
 
 ## Lizenz
 
-Private Nutzung. Nicht weiterverbreiten ohne Genehmigung.
+MIT — siehe [LICENSE](LICENSE).
