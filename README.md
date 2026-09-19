@@ -52,9 +52,11 @@ cd multi-llm-review
 # 2. Dependencies installieren
 npm install
 
-# 3. API-Keys konfigurieren
-cp .env.example .env
-# Dann .env bearbeiten und die 3 API-Keys eintragen
+# 3. API-Keys konfigurieren (ausserhalb des Repos, nie im Projektordner)
+mkdir -p ~/.config/multi-llm-review
+cp .env.example ~/.config/multi-llm-review/.env
+# Dann die Datei bearbeiten und die 3 API-Keys eintragen.
+# Aufruf: node --env-file=~/.config/multi-llm-review/.env src/cli.js <file>
 ```
 
 ### .env Konfiguration
